@@ -1,6 +1,6 @@
 class Reader {
   constructor(tokens) {
-    this.tokens = tokens;
+    this.tokens = [...tokens];
     this.position = 0;
   }
 
