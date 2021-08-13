@@ -17,9 +17,10 @@ class Reader {
 
 const tokenize = str => {
   const regex =
-      /[\s,]*(~@|[\[\]{}()'`~^@]|"(?:\\.|[^\\"])*"?|;.*|[^\s\[\]{}('"`,;)]*)/g;
+    /[\s,]*(~@|[\[\]{}()'`~^@]|"(?:\\.|[^\\"])*"?|;.*|[^\s\[\]{}('"`,;)]*)/g;
   const tokens = [];
-  while ((token = regex.exec(str)[1]) != '') if (token[0] !== ';') tokens.push(token);
+  while ((token = regex.exec(str)[1]) != '')
+    if (token[0] !== ';') tokens.push(token);
   return tokens;
 };
 
@@ -32,6 +33,7 @@ const read_atom = token => {
 const read_list = reader => {
   const result = [];
   while ((token = reader.peek()) != ')') {
+    if (!token) throw new Error('unbalanced');
     result.push(read_form(reader));
     reader.next();
   }
@@ -48,6 +50,7 @@ const read_form = reader => {
 };
 
 const read_str = str => {
+  if (str === '') return '';
   const reader = new Reader(tokenize(str));
   return read_form(reader);
 };
