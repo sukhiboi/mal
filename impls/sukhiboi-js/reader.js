@@ -17,20 +17,33 @@ class Reader {
 
 const tokenize = str => {
   const regex =
-    /[\s,]*(~@|[\[\]{}()'`~^@]|"(?:\\.|[^\\"])*"?|;.*|[^\s\[\]{}('"`,;)]*)/g;
+      /[\s,]*(~@|[\[\]{}()'`~^@]|"(?:\\.|[^\\"])*"?|;.*|[^\s\[\]{}('"`,;)]*)/g;
   const tokens = [];
-  while ((token = regex.exec(str)[0]) != '') tokens.push(token);
+  while ((token = regex.exec(str)[1]) != '') if (token[0] !== ';') tokens.push(token);
   return tokens;
 };
 
 const read_atom = token => {
   if (token.match(/^\-?[0-9]+$/)) return parseInt(token);
   if (token.match(/^\-?[0-9]+\.?[0-9]+$/)) return parseFloat(token);
+  return token;
+};
+
+const read_list = reader => {
+  const result = [];
+  while ((token = reader.peek()) != ')') {
+    result.push(read_form(reader));
+    reader.next();
+  }
+  return result;
 };
 
 const read_form = reader => {
   const token = reader.peek();
-  reader.next();
+  if (token === '(') {
+    reader.next();
+    return read_list(reader);
+  }
   return read_atom(token);
 };
 
