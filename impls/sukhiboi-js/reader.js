@@ -19,21 +19,21 @@ const tokenize = str => {
   const regex =
     /[\s,]*(~@|[\[\]{}()'`~^@]|"(?:\\.|[^\\"])*"?|;.*|[^\s\[\]{}('"`,;)]*)/g;
   const tokens = [];
-  while ((token = regex.exec(str)[1]) != '')
+  while ((token = regex.exec(str)[1]) !== '')
     if (token[0] !== ';') tokens.push(token);
   return tokens;
 };
 
 const read_atom = token => {
-  if (token.match(/^\-?[0-9]+$/)) return parseInt(token);
-  if (token.match(/^\-?[0-9]+\.?[0-9]+$/)) return parseFloat(token);
+  if (token.match(/^-?[0-9]+$/)) return parseInt(token);
+  if (token.match(/^-?[0-9]+\.?[0-9]+$/)) return parseFloat(token);
   return token;
 };
 
 const read_list = reader => {
   const result = [];
-  while ((token = reader.peek()) != ')') {
-    if (!token) throw new Error('unbalanced');
+  while ((token = reader.peek()) !== ')') {
+    if (!token) throw "unbalanced";
     result.push(read_form(reader));
     reader.next();
   }
