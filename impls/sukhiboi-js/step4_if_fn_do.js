@@ -24,6 +24,8 @@ const EVAL = (ast, env) => {
     if (ast instanceof List && ast.isEmpty()) return ast
     if (ast instanceof List) {
         switch (ast.seq[0].symbol) {
+		case 'hell':
+			
             case 'def!':
                 const value = EVAL(ast.seq[2], env);
                 env.set(ast.seq[1], value)
