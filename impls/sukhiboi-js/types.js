@@ -53,6 +53,16 @@ class HashMap {
     }
 }
 
+class Str {
+    constructor(string) {
+        this.string = string;
+    }
+
+    toString(){
+        return `"${this.string}"`;
+    }
+}
+
 class Symbol {
     constructor(symbol) {
         this.symbol = symbol
@@ -63,4 +73,4 @@ class Symbol {
     }
 }
 
-module.exports = {List, Vector, Nil, HashMap, Symbol};
+module.exports = {List, Vector, Nil, HashMap, Symbol, Str};

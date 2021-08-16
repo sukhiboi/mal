@@ -1,4 +1,4 @@
-const {List, Vector, Nil, HashMap, Symbol} = require("./types");
+const {List, Vector, Nil, HashMap, Symbol, Str} = require("./types");
 
 class Reader {
     constructor(tokens) {
@@ -47,8 +47,15 @@ const read_seq = (reader, closing) => {
 
 const read_hashmap = reader => {
     const seq = read_seq(reader, '}');
-    if(seq.length % 2 !== 0) throw 'unbalanced'
+    if (seq.length % 2 !== 0) throw 'unbalanced'
     return seq;
+}
+
+const read_string = (token, quote) => {
+    const inputString = String.raw({raw: token}).slice(1, -1);
+    const doubleQuoteCount = (inputString.match(new RegExp(quote, 'g')) || []).length;
+    if (doubleQuoteCount % 2 !== 0 || inputString.slice(-2) === `\\${quote}`) throw 'unbalanced';
+    return inputString;
 }
 
 const read_form = reader => {
@@ -56,6 +63,8 @@ const read_form = reader => {
     if (token === '(') return new List(read_seq(reader, ')'));
     if (token === '[') return new Vector(read_seq(reader, ']'));
     if (token === '{') return new HashMap(read_hashmap(reader));
+    if (token.startsWith('"')) return new Str(read_string(token, '"'));
+    if (token.startsWith(`'`)) return new Str(read_string(token, `'`));
     if (token === 'true') return true;
     if (token === 'false') return false;
     if (token === 'nil') return new Nil();
