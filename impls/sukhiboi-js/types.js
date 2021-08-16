@@ -90,4 +90,18 @@ class Symbol {
     }
 }
 
-module.exports = {List, Vector, Nil, HashMap, Symbol, Str};
+class Func {
+    constructor(fn) {
+        this.fn = fn;
+    }
+
+    apply(args) {
+        return this.fn.apply(null, args);
+    }
+
+    toString() {
+        return '#<function>';
+    }
+}
+
+module.exports = {List, Vector, Nil, HashMap, Symbol, Str, Func};

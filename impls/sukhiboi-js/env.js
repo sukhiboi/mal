@@ -1,9 +1,10 @@
-const {Nil} = require("./types");
+const {Nil, List} = require("./types");
 
 class Env {
-    constructor(outerEnv) {
+    constructor(outerEnv, bindings = new List([]), expressions = []) {
         this.outerEnv = outerEnv;
         this.data = {};
+        bindings.seq.forEach((binding, idx) => this.set(binding, expressions[idx]));
     }
 
     set(key, ast) {
