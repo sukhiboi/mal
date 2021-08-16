@@ -3,6 +3,7 @@ const read_str = require('./reader');
 const pr_str = require('./printer');
 const {List, Symbol, Vector, HashMap, Nil, Func} = require("./types");
 const Env = require('./env');
+const CORE_ENV = require('./core');
 
 const rl = readline.createInterface({
     input: process.stdin,
@@ -51,26 +52,21 @@ const EVAL = (ast, env) => {
         return fnToCall.apply(args);
     }
 };
-
 const PRINT = pr_str;
 const rep = (str, env) => PRINT(EVAL(READ(str), env));
 
-const repl = repl_env => {
+
+const repl = env => {
+    rep('(def! not (fn* (a) (if a false true)))', env)
     rl.question('user> ', input => {
         try {
-            console.log(rep(input, repl_env));
+            console.log(rep(input, env));
         } catch (err) {
             console.log(err);
         } finally {
-            repl(repl_env);
+            repl(env);
         }
     });
 };
 
-const repl_env = new Env(new Nil());
-repl_env.set(new Symbol('+'), new Func((a, b) => a + b));
-repl_env.set(new Symbol('-'), new Func((a, b) => a - b));
-repl_env.set(new Symbol('*'), new Func((a, b) => a * b));
-repl_env.set(new Symbol('/'), new Func((a, b) => a / b));
-
-repl(repl_env);
+repl(CORE_ENV);
