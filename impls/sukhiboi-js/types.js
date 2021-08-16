@@ -7,6 +7,10 @@ class List {
         return this.seq.length === 0;
     }
 
+    map(fn) {
+        return new List(this.seq.map(fn));
+    }
+
     toString() {
         return `(${this.seq.map(form => form.toString()).join(' ')})`
     }
@@ -19,6 +23,10 @@ class Vector {
 
     isEmpty() {
         return this.seq.length === 0;
+    }
+
+    map(fn) {
+        return new Vector(this.seq.map(fn));
     }
 
     toString() {
@@ -46,6 +54,15 @@ class HashMap {
 
     isEmpty() {
         return this.seq.length === 0;
+    }
+
+    valueMap(fn) {
+        const hashMapSeq = [];
+        for (let i = 0; i < this.seq.length; i += 2) {
+            hashMapSeq.push(this.seq[i]);
+            hashMapSeq.push(fn(this.seq[i+1]));
+        }
+        return new HashMap(hashMapSeq);
     }
 
     toString() {
