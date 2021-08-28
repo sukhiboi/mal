@@ -91,12 +91,10 @@ class Symbol {
 }
 
 class Func {
-    constructor(fn) {
-        this.fn = fn;
-    }
-
-    apply(args) {
-        return this.fn.apply(null, args);
+    constructor(body, params, env) {
+        this.env = env;
+        this.params = params;
+        this.body = body;
     }
 
     toString() {

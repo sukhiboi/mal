@@ -40,21 +40,26 @@ const EVAL = (ast, env) => {
                     ast = ast.seq[2];
                     break;
                 case 'do':
-                    const [result] = EVAL(new List(ast.seq.slice(1)), env).seq.slice(-1);
-                    return result;
+                    const instructions = new List(ast.seq.slice(1));
+                    instructions.seq.slice(0, -1).forEach(inst => eval_ast(inst, env))
+                    ast = instructions.seq[instructions.seq.length - 1];
+                    break;
                 case 'if':
                     const [condition, truthyValue, falsyValue] = ast.seq.slice(1);
                     const evaluatedCondition = EVAL(condition, env);
-                    if (evaluatedCondition !== false && !(evaluatedCondition instanceof Nil)) return EVAL(truthyValue, env);
-                    return falsyValue ? EVAL(falsyValue, env) : new Nil();
+                    if (evaluatedCondition !== false && !(evaluatedCondition instanceof Nil)) ast = truthyValue;
+                    else ast = falsyValue ? falsyValue : new Nil();
+                    break;
                 case 'fn*':
-                    return new Func(function (...args) {
-                        const localEnv = new Env(env, ast.seq[1], args);
-                        return EVAL(ast.seq[2], localEnv);
-                    })
+                    return new Func(ast.seq[2], ast.seq[1], env);
+                default:
+                    const [fnToCall, ...args] = eval_ast(ast, env).seq;
+                    if (fnToCall instanceof Function) return fnToCall.apply(null, args);
+                    if (fnToCall instanceof Func) {
+                        ast = fnToCall.body;
+                        env = new Env(env, fnToCall.params, args);
+                    }
             }
-            const [fnToCall, ...args] = eval_ast(ast, env).seq;
-            return fnToCall.apply(args);
         }
     }
 };
@@ -63,7 +68,7 @@ const rep = (str, env) => PRINT(EVAL(READ(str), env));
 
 
 const repl = env => {
-    rep('(def! not (fn* (a) (if a false true)))', env)
+    // rep('(def! not (fn* (a) (if a false true)))', env)
     rl.question('user> ', input => {
         try {
             console.log(rep(input, env));

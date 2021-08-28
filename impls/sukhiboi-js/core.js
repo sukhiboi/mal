@@ -1,5 +1,5 @@
 const Env = require("./env");
-const {Nil, Symbol, Func, List} = require("./types");
+const {Nil, Symbol, List} = require("./types");
 
 const CORE_ENV = new Env(new Nil());
 
@@ -19,6 +19,6 @@ const coreFunctions = {
     '=': (a, b) => JSON.stringify(a) === JSON.stringify(b),
 }
 
-Object.keys(coreFunctions).forEach(key => CORE_ENV.set(new Symbol(key), new Func(coreFunctions[key])))
+Object.keys(coreFunctions).forEach(key => CORE_ENV.set(new Symbol(key), coreFunctions[key]))
 
 module.exports = CORE_ENV;
