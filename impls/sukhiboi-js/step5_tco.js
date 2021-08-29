@@ -4,6 +4,7 @@ const pr_str = require('./printer');
 const {List, Symbol, Vector, HashMap, Nil, Func} = require("./types");
 const Env = require('./env');
 const CORE_ENV = require('./core');
+const {zip, last} = require("ramda");
 
 const rl = readline.createInterface({
     input: process.stdin,
@@ -27,22 +28,19 @@ const EVAL = (ast, env) => {
             switch (ast.seq[0].symbol) {
                 case 'def!':
                     const value = EVAL(ast.seq[2], env);
-                    env.set(ast.seq[1], value)
-                    return value;
+                    return env.set(ast.seq[1], value);
                 case 'let*':
                     const localEnv = new Env(env);
                     const bindingList = ast.seq[1].seq;
-                    for (let i = 0, j = i + 1; i < bindingList.length; i += 2) {
-                        let evaluatedValue = EVAL(bindingList[j], localEnv);
-                        localEnv.set(bindingList[i], evaluatedValue);
-                    }
+                    const keyValuePairs = zip(bindingList, bindingList.slice(1));
+                    keyValuePairs.forEach(([key, value]) => localEnv.set(key, EVAL(value, localEnv)));
                     env = localEnv;
                     ast = ast.seq[2];
                     break;
                 case 'do':
                     const instructions = new List(ast.seq.slice(1));
-                    instructions.seq.slice(0, -1).forEach(inst => eval_ast(inst, env))
-                    ast = instructions.seq[instructions.seq.length - 1];
+                    instructions.seq.forEach(inst => eval_ast(inst, env))
+                    ast = last(instructions.seq);
                     break;
                 case 'if':
                     const [condition, truthyValue, falsyValue] = ast.seq.slice(1);

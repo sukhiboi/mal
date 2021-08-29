@@ -9,6 +9,7 @@ class Env {
 
     set(key, ast) {
         this.data[key.symbol] = ast;
+        return ast;
     }
 
     find(key) {
