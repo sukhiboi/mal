@@ -5,6 +5,7 @@ const {List, Symbol, Vector, HashMap, Nil, Func} = require("./types");
 const Env = require('./env');
 const CORE_ENV = require('./core');
 const {zip, last} = require("ramda");
+const chalk = require("chalk");
 
 const rl = readline.createInterface({
     input: process.stdin,
@@ -66,8 +67,11 @@ const rep = (str, env) => PRINT(EVAL(READ(str), env));
 
 
 const repl = env => {
-    // rep('(def! not (fn* (a) (if a false true)))', env)
-    rl.question('user> ', input => {
+    rep('(def! not (fn* (a) (if a false true)))', env)
+    const prompt = [
+        chalk.blue(chalk.bold('❯ ')),
+    ].join('');
+    rl.question(prompt, input => {
         try {
             console.log(rep(input, env));
         } catch (err) {
