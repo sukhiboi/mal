@@ -1,4 +1,4 @@
-const {List, Vector, Nil, HashMap, Symbol, Str} = require("./types");
+const {List, Vector, Nil, HashMap, Symbol, Str, Keyword} = require("./types");
 
 class Reader {
     constructor(tokens) {
@@ -29,6 +29,10 @@ const tokenize = str => {
 const read_atom = token => {
     if (token.match(/^-?[0-9]+$/)) return parseInt(token);
     if (token.match(/^-?[0-9]+\.?[0-9]+$/)) return parseFloat(token);
+    if (token === 'true') return true;
+    if (token === 'false') return false;
+    if (token === 'nil') return new Nil();
+    if(token.startsWith(':')) return new Keyword(token.slice(1))
     return new Symbol(token);
 };
 
@@ -51,11 +55,11 @@ const read_hashmap = reader => {
     return seq;
 }
 
-const read_string = (token, quote) => {
-    const inputString = String.raw({raw: token}).slice(1, -1);
-    const doubleQuoteCount = (inputString.match(new RegExp(quote, 'g')) || []).length;
-    if (doubleQuoteCount % 2 !== 0 || inputString.slice(-2) === `\\${quote}`) throw 'unbalanced';
-    return inputString;
+const read_string = (token) => {
+    if(!/[^\\]"$/.test(token)){
+        throw "unbalanced";
+    }
+    return token.slice(1, -1).replace(/\\(.)/g,(_, c) => c === "n" ? "\n" : c);
 }
 
 const read_form = reader => {
@@ -63,11 +67,7 @@ const read_form = reader => {
     if (token === '(') return new List(read_seq(reader, ')'));
     if (token === '[') return new Vector(read_seq(reader, ']'));
     if (token === '{') return new HashMap(read_hashmap(reader));
-    if (token.startsWith('"')) return new Str(read_string(token, '"'));
-    if (token.startsWith(`'`)) return new Str(read_string(token, `'`));
-    if (token === 'true') return true;
-    if (token === 'false') return false;
-    if (token === 'nil') return new Nil();
+    if (token.startsWith('"'))return new Str(read_string(token));
     return read_atom(token);
 };
 

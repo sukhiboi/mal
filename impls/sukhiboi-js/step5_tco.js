@@ -1,7 +1,7 @@
 const readline = require('readline');
 const read_str = require('./reader');
 const pr_str = require('./printer');
-const {List, Symbol, Vector, HashMap, Nil, Func} = require("./types");
+const {List, Symbol, Vector, HashMap, Nil, Func, Keyword} = require("./types");
 const Env = require('./env');
 const CORE_ENV = require('./core');
 const {zip, last} = require("ramda");
@@ -17,6 +17,7 @@ const eval_ast = (ast, env) => {
     if (ast instanceof Vector) return ast.map(form => EVAL(form, env))
     if (ast instanceof HashMap) return ast.valueMap(form => EVAL(form, env))
     if (ast instanceof Symbol) return env.get(ast);
+    if (ast instanceof Keyword) return env.get(ast);
     return ast;
 }
 

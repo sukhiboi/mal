@@ -60,7 +60,7 @@ class HashMap {
         const hashMapSeq = [];
         for (let i = 0; i < this.seq.length; i += 2) {
             hashMapSeq.push(this.seq[i]);
-            hashMapSeq.push(fn(this.seq[i+1]));
+            hashMapSeq.push(fn(this.seq[i + 1]));
         }
         return new HashMap(hashMapSeq);
     }
@@ -75,8 +75,12 @@ class Str {
         this.string = string;
     }
 
-    toString(){
-        return `"${this.string}"`;
+    toString() {
+        return `"${this.string
+            .replace(/\\/g, "\\\\")
+            .replace(/"/g, '\\"')
+            .replace(/\n/g, "\\n")
+            .toString()}"`;
     }
 }
 
@@ -102,4 +106,14 @@ class Func {
     }
 }
 
-module.exports = {List, Vector, Nil, HashMap, Symbol, Str, Func};
+class Keyword {
+    constructor(keyword) {
+        this.keyword = keyword;
+    }
+
+    toString() {
+        return `:${this.keyword.toString()}`;
+    }
+}
+
+module.exports = {List, Vector, Nil, HashMap, Symbol, Str, Func, Keyword};
