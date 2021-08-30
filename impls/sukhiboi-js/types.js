@@ -1,5 +1,11 @@
-class List {
+class MalTypes {
+    constructor() {
+    }
+}
+
+class List extends MalTypes {
     constructor(seq) {
+        super();
         this.seq = seq;
     }
 
@@ -11,13 +17,14 @@ class List {
         return new List(this.seq.map(fn));
     }
 
-    toString() {
-        return `(${this.seq.map(form => form.toString()).join(' ')})`
+    toString(readably) {
+        return `(${this.seq.map(form => form.toString(readably)).join(' ')})`
     }
 }
 
-class Vector {
+class Vector extends MalTypes {
     constructor(seq) {
+        super();
         this.seq = seq;
     }
 
@@ -29,13 +36,14 @@ class Vector {
         return new Vector(this.seq.map(fn));
     }
 
-    toString() {
-        return `[${this.seq.map(form => form.toString()).join(' ')}]`
+    toString(readably) {
+        return `[${this.seq.map(form => form.toString(readably)).join(' ')}]`
     }
 }
 
-class Nil {
+class Nil extends MalTypes {
     constructor() {
+        super();
     }
 
     toString() {
@@ -43,8 +51,9 @@ class Nil {
     }
 }
 
-class HashMap {
+class HashMap extends MalTypes {
     constructor(seq) {
+        super();
         this.seq = seq;
         this.hashmap = new Map();
         for (let i = 0; i < seq.length; i += 2) {
@@ -65,27 +74,34 @@ class HashMap {
         return new HashMap(hashMapSeq);
     }
 
-    toString() {
-        return `{${this.seq.map(form => form.toString()).join(' ')}}`
+    toString(readably) {
+        return `{${this.seq.map(form => form.toString(readably)).join(' ')}}`
     }
 }
 
-class Str {
+class Str extends MalTypes {
     constructor(string) {
+        super();
         this.string = string;
     }
 
-    toString() {
-        return `"${this.string
+    concat(string) {
+        return new Str(`${this.string}${string.string}`);
+    }
+
+    toString(readably) {
+        if(readably) return `"${this.string
             .replace(/\\/g, "\\\\")
             .replace(/"/g, '\\"')
             .replace(/\n/g, "\\n")
             .toString()}"`;
+        return this.string;
     }
 }
 
-class Symbol {
+class Symbol extends MalTypes {
     constructor(symbol) {
+        super();
         this.symbol = symbol
     }
 
@@ -94,8 +110,9 @@ class Symbol {
     }
 }
 
-class Func {
+class Func extends MalTypes {
     constructor(body, params, env) {
+        super();
         this.env = env;
         this.params = params;
         this.body = body;
@@ -106,8 +123,9 @@ class Func {
     }
 }
 
-class Keyword {
+class Keyword extends MalTypes {
     constructor(keyword) {
+        super();
         this.keyword = keyword;
     }
 
@@ -116,4 +134,4 @@ class Keyword {
     }
 }
 
-module.exports = {List, Vector, Nil, HashMap, Symbol, Str, Func, Keyword};
+module.exports = {List, Vector, Nil, HashMap, Symbol, Str, Func, Keyword, MalTypes};
