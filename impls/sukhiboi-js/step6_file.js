@@ -45,7 +45,7 @@ const EVAL = (ast, env) => {
                     ast = last(instructions.seq);
                     break;
                 case 'if':
-                const [condition, truthyValue, falsyValue] = ast.seq.slice(1);
+                    const [condition, truthyValue, falsyValue] = ast.seq.slice(1);
                     const evaluatedCondition = EVAL(condition, env);
                     if (evaluatedCondition !== false && !(evaluatedCondition instanceof Nil)) ast = truthyValue;
                     else ast = falsyValue ? falsyValue : new Nil();
@@ -68,7 +68,15 @@ const rep = (str, env) => PRINT(EVAL(READ(str), env));
 
 CORE_ENV.set(new Symbol('eval'), ast => EVAL(ast, CORE_ENV));
 CORE_ENV.set(new Symbol('swap!'), (atom, func, ...args) => {
-    const list = new List([new Symbol('reset!'), atom, new List([func,atom.value, ...args])]);
+    const list = new List([
+        new Symbol('reset!'),
+        atom,
+        new List([
+            func,
+            atom.value,
+            ...args
+        ])
+    ]);
     return EVAL(list, CORE_ENV);
 });
 
