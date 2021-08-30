@@ -134,4 +134,20 @@ class Keyword extends MalTypes {
     }
 }
 
-module.exports = {List, Vector, Nil, HashMap, Symbol, Str, Func, Keyword, MalTypes};
+class Atom extends MalTypes {
+    constructor(value) {
+        super();
+        this.value = value;
+    }
+
+    reset(value) {
+        this.value = value;
+        return this.value;
+    }
+
+    toString() {
+        return `(Atom ${this.value})`;
+    }
+}
+
+module.exports = {List, Vector, Nil, HashMap, Symbol, Str, Func, Keyword, Atom, MalTypes};

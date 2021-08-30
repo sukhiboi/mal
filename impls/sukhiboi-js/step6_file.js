@@ -67,6 +67,15 @@ const PRINT = pr_str;
 const rep = (str, env) => PRINT(EVAL(READ(str), env));
 
 CORE_ENV.set(new Symbol('eval'), ast => EVAL(ast, CORE_ENV));
+CORE_ENV.set(new Symbol('swap!'), (atom, func, ...args) => {
+    const list = new List([new Symbol('reset!'), atom, new List([func,atom.value, ...args])]);
+    return EVAL(list, CORE_ENV);
+});
+
+/**
+ * (def swap! (fn* [atom func, ...arg] (reset! atom (func (deref atom) ...args))))
+ * @param env
+ */
 
 const repl = env => {
     rep('(def! not (fn* (a) (if a false true)))', env);

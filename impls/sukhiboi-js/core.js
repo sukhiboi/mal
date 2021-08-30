@@ -1,5 +1,5 @@
 const Env = require("./env");
-const {Nil, Symbol, List, Str} = require("./types");
+const {Nil, Symbol, List, Str, Atom} = require("./types");
 const fs = require('fs');
 const read_str = require("./reader");
 const pr_str = require("./printer");
@@ -32,7 +32,11 @@ const coreFunctions = {
     'read-string': str => {
         return read_str(str)
     },
-    'slurp': fileName => new Str(fs.readFileSync(fileName.string, 'utf8'))
+    'slurp': fileName => new Str(fs.readFileSync(fileName.string, 'utf8')),
+    'atom': value => new Atom(value),
+    'atom?': atom => atom instanceof Atom,
+    'deref': atom => atom.value,
+    'reset!': (atom, value) => atom.reset(value),
 }
 
 Object.keys(coreFunctions).forEach(key => CORE_ENV.set(new Symbol(key), coreFunctions[key]))
