@@ -122,11 +122,17 @@ class Symbol extends MalTypes {
 }
 
 class Func extends MalTypes {
-    constructor(body, params, env) {
+    constructor(body, params, env, fn, isMacro = false) {
         super();
         this.env = env;
         this.params = params;
         this.body = body;
+        this.fn = fn;
+        this.isMacro = isMacro;
+    }
+
+    apply(args) {
+        return this.fn.apply(null, args);
     }
 
     toString() {
