@@ -5,7 +5,6 @@ const {List, Symbol, Vector, HashMap, Nil, Func, Keyword} = require("./types");
 const Env = require('./env');
 const CORE_ENV = require('./core');
 const {zip, last} = require("ramda");
-const chalk = require("chalk");
 
 const rl = readline.createInterface({
     input: process.stdin,
@@ -54,11 +53,14 @@ const EVAL = (ast, env) => {
                     return new Func(ast.seq[2], ast.seq[1], env);
                 default:
                     const [fnToCall, ...args] = eval_ast(ast, env).seq;
-                    if (fnToCall instanceof Function) return fnToCall.apply(null, args);
                     if (fnToCall instanceof Func) {
                         ast = fnToCall.body;
                         env = new Env(env, fnToCall.params, args);
                     }
+                    if(!(fnToCall instanceof Function)){
+                        return fnToCall;
+                    }
+                    return fnToCall.apply(null, args);
             }
         }
     }
@@ -89,10 +91,7 @@ const repl = env => {
     rep('(def! not (fn* (a) (if a false true)))', env);
     rep('(def! load-file (fn* (f) (eval (read-string (str "(do " (slurp f) "\\nnil)")))))', env)
     rep('(def! f "impls/tests/incA.mal")', env);
-    const prompt = [
-        chalk.blue(chalk.bold('❯ ')),
-    ].join('');
-    rl.question(prompt, input => {
+    rl.question('user> ', input => {
         try {
             console.log(rep(input, env));
         } catch (err) {
