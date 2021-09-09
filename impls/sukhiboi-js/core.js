@@ -37,6 +37,8 @@ const coreFunctions = {
     'atom?': atom => atom instanceof Atom,
     'deref': atom => atom.value,
     'reset!': (atom, value) => atom.reset(value),
+    'cons': (list1, list2) => new List([list1, ...list2]),
+    'concat': (...lists) => new List(lists.reduce((finalList, list = []) => finalList.concat(list.seq), []))
 }
 
 Object.keys(coreFunctions).forEach(key => CORE_ENV.set(new Symbol(key), coreFunctions[key]))
