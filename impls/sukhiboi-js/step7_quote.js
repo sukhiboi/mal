@@ -4,7 +4,7 @@ const pr_str = require('./printer');
 const {List, Symbol, Vector, HashMap, Nil, Func, Keyword} = require("./types");
 const Env = require('./env');
 const CORE_ENV = require('./core');
-const {zip, last} = require("ramda");
+const {zip, last, reverse} = require("ramda");
 
 const rl = readline.createInterface({
     input: process.stdin,
@@ -17,6 +17,23 @@ const eval_ast = (ast, env) => {
     if (ast instanceof HashMap) return ast.valueMap(form => EVAL(form, env))
     if (ast instanceof Symbol) return env.get(ast);
     if (ast instanceof Keyword) return env.get(ast);
+    return ast;
+}
+
+const quasiquote = (ast) => {
+    if (ast instanceof List && ast.seq[0].symbol === 'unquote') return ast.seq[1];
+    if (ast instanceof List) {
+        let result = new List([]);
+        reverse(ast.seq).forEach(elt => {
+            if ((elt instanceof List) && elt.seq[0].symbol === 'splice-unquote') {
+                result = new List([new Symbol('concat'), elt.seq[1], result]);
+            } else {
+                result = new List([new Symbol('cons'), quasiquote(elt), result]);
+            }
+        })
+        return result;
+    }
+    if ((ast instanceof Symbol) || (ast instanceof HashMap)) return new List([new Symbol('quote'), ast])
     return ast;
 }
 
@@ -53,13 +70,15 @@ const EVAL = (ast, env) => {
                     return new Func(ast.seq[2], ast.seq[1], env);
                 case 'quote':
                     return ast.seq[1];
+                case 'quasiquoteexpand':
+                    return quasiquote(ast.seq[1]);
                 default:
                     const [fnToCall, ...args] = eval_ast(ast, env).seq;
                     if (fnToCall instanceof Func) {
                         ast = fnToCall.body;
                         env = new Env(env, fnToCall.params, args);
                     }
-                    if(!(fnToCall instanceof Function)){
+                    if (!(fnToCall instanceof Function)) {
                         return fnToCall;
                     }
                     return fnToCall.apply(null, args);
