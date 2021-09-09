@@ -51,6 +51,8 @@ const EVAL = (ast, env) => {
                     break;
                 case 'fn*':
                     return new Func(ast.seq[2], ast.seq[1], env);
+                case 'quote':
+                    return ast.seq[1];
                 default:
                     const [fnToCall, ...args] = eval_ast(ast, env).seq;
                     if (fnToCall instanceof Func) {

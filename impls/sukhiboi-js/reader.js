@@ -62,12 +62,21 @@ const read_string = (token) => {
     return token.slice(1, -1).replace(/\\(.)/g,(_, c) => c === "n" ? "\n" : c);
 }
 
+const prependSymbol = (reader, symbolStr) => {
+    reader.next();
+    const symbol = new Symbol(symbolStr);
+    const ast = read_form(reader);
+    return new List([symbol, ast]);
+}
+
 const read_form = reader => {
     const token = reader.peek();
     if (token === '(') return new List(read_seq(reader, ')'));
     if (token === '[') return new Vector(read_seq(reader, ']'));
     if (token === '{') return new HashMap(read_hashmap(reader));
     if (token.startsWith('"'))return new Str(read_string(token));
+    if (token === '@') return prependSymbol(reader, 'deref')
+    if (token === `'`) return prependSymbol(reader, 'quote')
     return read_atom(token);
 };
 

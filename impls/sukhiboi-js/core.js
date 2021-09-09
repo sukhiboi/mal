@@ -37,7 +37,7 @@ const coreFunctions = {
     'atom?': atom => atom instanceof Atom,
     'deref': atom => atom.value,
     'reset!': (atom, value) => atom.reset(value),
-    'cons': (list1, list2) => new List([list1, ...list2]),
+    'cons': (list1, list2 ) => new List([list1, ...list2.seq]),
     'concat': (...lists) => new List(lists.reduce((finalList, list = []) => finalList.concat(list.seq), []))
 }
 
