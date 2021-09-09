@@ -21,20 +21,24 @@ const eval_ast = (ast, env) => {
 }
 
 const quasiquote = (ast) => {
-    if (ast instanceof List && ast.seq[0].symbol === 'unquote') return ast.seq[1];
-    if (ast instanceof List) {
-        let result = new List([]);
-        reverse(ast.seq).forEach(elt => {
-            if ((elt instanceof List) && elt.seq[0].symbol === 'splice-unquote') {
-                result = new List([new Symbol('concat'), elt.seq[1], result]);
-            } else {
-                result = new List([new Symbol('cons'), quasiquote(elt), result]);
-            }
-        })
-        return result;
+    if(!(ast instanceof List || ast instanceof Vector)){
+        if(ast instanceof Symbol || ast instanceof HashMap){
+            return new List([new Symbol('quote'), ast]);
+        }
+        return ast;
     }
-    if ((ast instanceof Symbol) || (ast instanceof HashMap)) return new List([new Symbol('quote'), ast])
-    return ast;
+
+    if (ast instanceof List && ast.seq[0] && ast.seq[0].symbol === 'unquote') return ast.seq[1];
+
+    let result = new List([]);
+    reverse(ast.seq).forEach(elt => {
+        if ((elt instanceof List) && elt.seq[0] && elt.seq[0].symbol === 'splice-unquote') {
+            result = new List([new Symbol('concat'), elt.seq[1], result]);
+        } else {
+            result = new List([new Symbol('cons'), quasiquote(elt), result]);
+        }
+    })
+    return (ast instanceof List) ? result : new List([new Symbol('vec'), result])
 }
 
 const READ = read_str;
@@ -72,6 +76,9 @@ const EVAL = (ast, env) => {
                     return ast.seq[1];
                 case 'quasiquoteexpand':
                     return quasiquote(ast.seq[1]);
+                case 'quasiquote':
+                    ast = quasiquote(ast.seq[1]);
+                    continue;
                 default:
                     const [fnToCall, ...args] = eval_ast(ast, env).seq;
                     if (fnToCall instanceof Func) {
@@ -87,7 +94,7 @@ const EVAL = (ast, env) => {
     }
 };
 const PRINT = pr_str;
-const rep = (str, env) => PRINT(EVAL(READ(str), env));
+const rep = (str, env) => PRINT(EVAL(READ(str), env), true);
 
 CORE_ENV.set(new Symbol('eval'), ast => EVAL(ast, CORE_ENV));
 CORE_ENV.set(new Symbol('swap!'), (atom, func, ...args) => {

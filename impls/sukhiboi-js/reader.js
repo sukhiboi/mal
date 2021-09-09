@@ -1,4 +1,4 @@
-const {List, Vector, Nil, HashMap, Symbol, Str, Keyword} = require("./types");
+const {List, Vector, Nil, HashMap, Symbol, Str, Keyword, Number} = require("./types");
 
 class Reader {
     constructor(tokens) {
@@ -27,8 +27,8 @@ const tokenize = str => {
 };
 
 const read_atom = token => {
-    if (token.match(/^-?[0-9]+$/)) return parseInt(token);
-    if (token.match(/^-?[0-9]+\.?[0-9]+$/)) return parseFloat(token);
+    if (token.match(/^-?[0-9]+$/)) return new Number(parseInt(token));
+    if (token.match(/^-?[0-9]+\.?[0-9]+$/)) return new Number( parseFloat(token));
     if (token === 'true') return true;
     if (token === 'false') return false;
     if (token === 'nil') return new Nil();
@@ -77,6 +77,9 @@ const read_form = reader => {
     if (token.startsWith('"'))return new Str(read_string(token));
     if (token === '@') return prependSymbol(reader, 'deref')
     if (token === `'`) return prependSymbol(reader, 'quote')
+    if (token === '`') return prependSymbol(reader, 'quasiquote')
+    if (token === '~') return prependSymbol(reader, 'unquote')
+    if (token === '~@') return prependSymbol(reader, 'splice-unquote')
     return read_atom(token);
 };
 

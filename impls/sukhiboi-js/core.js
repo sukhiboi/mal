@@ -1,5 +1,5 @@
 const Env = require("./env");
-const {Nil, Symbol, List, Str, Atom} = require("./types");
+const {Nil, Symbol, List, Str, Atom, Vector} = require("./types");
 const fs = require('fs');
 const read_str = require("./reader");
 const pr_str = require("./printer");
@@ -16,6 +16,7 @@ const coreFunctions = {
     '<=': (a, b) => a <= b,
     '>=': (a, b) => a >= b,
     'list': (...elements) => new List(elements),
+    'vec': (list) => new Vector([...list.seq]),
     'list?': ast => ast instanceof List,
     'empty?': list => list.isEmpty(),
     'count': list => list.seq.length,

@@ -99,6 +99,17 @@ class Str extends MalTypes {
     }
 }
 
+class Number extends MalTypes  {
+    constructor(number) {
+        super();
+        this.number = number
+    }
+
+    toString() {
+        return `${this.number}`;
+    }
+}
+
 class Symbol extends MalTypes {
     constructor(symbol) {
         super();
@@ -150,4 +161,4 @@ class Atom extends MalTypes {
     }
 }
 
-module.exports = {List, Vector, Nil, HashMap, Symbol, Str, Func, Keyword, Atom, MalTypes};
+module.exports = {List, Vector, Nil, HashMap, Symbol, Str, Func, Keyword, Atom, Number, MalTypes};
